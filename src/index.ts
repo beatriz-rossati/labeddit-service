@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv'
 import { userRouter } from './router/userRouter';
 import { postRouter } from './router/postRouter';
+import { commentRouter } from './router/commentRouter';
 
 dotenv.config()
 
@@ -17,8 +18,8 @@ app.listen(Number(process.env.PORT || 3003), () => {
 
 app.use("/posts", postRouter)
 app.use("/users", userRouter)
+app.use("/comments", commentRouter)
 
 app.get('/healthcheck', (req: Request, res: Response) => {
-
     res.status(200).send("It's alive!")
 });

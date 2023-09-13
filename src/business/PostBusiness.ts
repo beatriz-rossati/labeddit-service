@@ -38,7 +38,8 @@ export class PostBusiness {
             new Date().toISOString(),
             new Date().toISOString(),
             payload.id,
-            payload.name
+            payload.name,
+            0
         )
 
         await this.postDatabase.insertPost(post.toPostDB())
@@ -57,6 +58,7 @@ export class PostBusiness {
         const postsJoinUserDB = await this.postDatabase.getPosts()
 
         const posts = postsJoinUserDB.map((postJoinUser) => {
+            console.log(postJoinUser)
             const post = new Post(
                 postJoinUser.id,
                 postJoinUser.content,
@@ -65,7 +67,8 @@ export class PostBusiness {
                 postJoinUser.created_at,
                 postJoinUser.updated_at,
                 postJoinUser.creator_id,
-                postJoinUser.creator_name
+                postJoinUser.creator_name,
+                postJoinUser.comments_count
             )
             return post.toPostResponse()
         })
@@ -99,7 +102,8 @@ export class PostBusiness {
             postDB.created_at,
             postDB.updated_at,
             postDB.creator_id,
-            payload.name
+            payload.name,
+            postDB.comments_count
         )
 
         post.setContent(content)
@@ -166,7 +170,8 @@ export class PostBusiness {
             postDBWithCreator.created_at,
             postDBWithCreator.updated_at,
             postDBWithCreator.creator_id,
-            postDBWithCreator.creator_name
+            postDBWithCreator.creator_name,
+            postDBWithCreator.comments_count
         )
 
         const ratingDB: RatingDB = {

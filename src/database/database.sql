@@ -37,6 +37,8 @@ CREATE TABLE
         FOREIGN KEY (creator_id) REFERENCES users (id) ON UPDATE CASCADE ON DELETE CASCADE
     );
 
+ALTER TABLE posts ADD comments_count INTEGER;
+
 INSERT INTO
     posts (id, creator_id, content)
 VALUES ('p001', 'u001', 'Bom dia!'), ('p002', 'u002', 'Boa noite!');
@@ -71,9 +73,10 @@ VALUES ('c001', 'u001', 'p001', 'Bom dia pra você também!');
 CREATE TABLE
     comments_rating(
         user_id TEXT NOT NULL,
-        comments_id TEXT NOT NULL,
+        comment_id TEXT NOT NULL,
         rating INTEGER NOT NULL,
         FOREIGN KEY (user_id) REFERENCES users (id) ON UPDATE CASCADE ON DELETE CASCADE,
-        FOREIGN KEY (comments_id) REFERENCES comments (id) ON UPDATE CASCADE ON DELETE CASCADE
+        FOREIGN KEY (comment_id) REFERENCES comments (id) ON UPDATE CASCADE ON DELETE CASCADE
     );
 
+DELETE FROM posts WHERE id = "33199ba7-4227-4c7f-9a01-ae58a64f53f9";
