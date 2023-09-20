@@ -6,7 +6,7 @@ export interface RatePostInputDTO {
     rating: boolean
 }
 
-export type RatePostOutputDTO = undefined
+export type RatePostOutputDTO = string
 
 export const RatePostSchema = z.object({
     token: z.string().min(1),

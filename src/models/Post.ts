@@ -5,7 +5,8 @@ export interface PostDB {
     upvotes: number,
     downvotes: number,
     created_at: string,
-    updated_at: string
+    updated_at: string,
+    comments_count: number
 }
 
 export interface PostDBJoin {
@@ -15,8 +16,9 @@ export interface PostDBJoin {
     upvotes: number,
     downvotes: number,
     created_at: string,
-    updated_at: string
-    creator_name: string
+    updated_at: string,
+    creator_name: string,
+    comments_count: number
 }
 
 export interface PostResponse {
@@ -29,7 +31,8 @@ export interface PostResponse {
     creator: {
         id: string,
         name: string
-    }
+    },
+    commentsCount: number
 }
 
 export interface RatingDB {
@@ -52,7 +55,8 @@ export class Post {
         private createdAt: string,
         private updatedAt: string,
         private creatorId: string,
-        private creatorName: string
+        private creatorName: string,
+        private commentsCount: number
     ) { }
 
     getId(): string {
@@ -72,9 +76,6 @@ export class Post {
     getUpvotes(): number {
         return this.upvotes
     }
-    setUpvotes(value: number): void {
-        this.upvotes = value
-    }
     addUpvote = (): void => {
         this.upvotes++
     }
@@ -84,9 +85,6 @@ export class Post {
 
     getDownvotes(): number {
         return this.downvotes
-    }
-    setDownvotes(value: number): void {
-        this.downvotes = value
     }
     addDownvote = (): void => {
         this.downvotes++
@@ -123,6 +121,16 @@ export class Post {
         this.creatorName
     }
 
+    getCommentsCount(): number {
+        return this.commentsCount
+    }
+    increaseCommentsCount = (): void => {
+        this.commentsCount++
+    }
+    decreaseCommentsCount = (): void => {
+        this.commentsCount--
+    }
+
     toPostDB(): PostDB {
         return {
             id: this.id,
@@ -131,7 +139,8 @@ export class Post {
             upvotes: this.upvotes,
             downvotes: this.downvotes,
             created_at: this.createdAt,
-            updated_at: this.updatedAt
+            updated_at: this.updatedAt,
+            comments_count: this.commentsCount
         }
     }
 
@@ -146,7 +155,8 @@ export class Post {
             creator: {
                 id: this.creatorId,
                 name: this.creatorName
-            }
+            },
+            commentsCount: this.commentsCount
         }
     }
 }

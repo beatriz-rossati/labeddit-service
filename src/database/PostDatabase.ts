@@ -24,7 +24,8 @@ export class PostDatabase extends BaseDatabase {
                 `${PostDatabase.TABLE_POSTS}.downvotes`,
                 `${PostDatabase.TABLE_POSTS}.created_at`,
                 `${PostDatabase.TABLE_POSTS}.updated_at`,
-                `${UserDatabase.TABLE_USERS}.name as creator_name`
+                `${UserDatabase.TABLE_USERS}.name as creator_name`,
+                `${PostDatabase.TABLE_POSTS}.comments_count`
             )
             .join(
                 `${UserDatabase.TABLE_USERS}`,

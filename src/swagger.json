@@ -1,0 +1,829 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API do Didn't Readdit",
+        "description": "API para rede social, que coordena usuários, posts e comentários",
+        "contact": {
+            "email": "biaschanner@gmail.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3003",
+            "description": "Teste"
+        }
+    ],
+    "paths": {
+        "/users/signup": {
+            "post": {
+                "summary": "Cadastrar usuário",
+                "description": "Podem ter dois tipos de usuário, o usuário 'normal' e o usuário do tipo 'admin'. <br> Para criar um usuário 'admin', insira no body a propriedade 'adminCode' com o valor '123456'. <br> Para criar um usuário 'normal', omita esse campo.",
+                "tags": [
+                    "Users"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User"
+                            },
+                            "examples": {
+                                "Admin_User": {
+                                    "value": {
+                                        "name": "Joana D'Arc",
+                                        "email": "joana@email.com",
+                                        "password": "senhaJoana",
+                                        "adminCode": "123456"
+                                    }
+                                },
+                                "Normal_User": {
+                                    "value": {
+                                        "name": "Moacyr Quirino",
+                                        "email": "moacyr@email.com",
+                                        "password": "senhaMoacyr"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Erros do Zod",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "path": [
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "E-mail já cadastrado"
+                    },
+                    "201": {
+                        "description": "Usuário cadastrado com sucesso e token de acesso gerado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/login": {
+            "post": {
+                "summary": "Realiza o login de um usuário",
+                "description": "",
+                "tags": [
+                    "Users"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User"
+                            },
+                            "examples": {
+                                "user": {
+                                    "value": {
+                                        "email": "joana@email.com",
+                                        "password": "senhaJoana"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Erros do Zod",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "path": [
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Esse e-mail não está cadastrado"
+                    },
+                    "401": {
+                        "description": "Senha inválida"
+                    },
+                    "200": {
+                        "description": "Login realizado, token de acesso gerado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/posts": {
+            "post": {
+                "summary": "Criar um novo post",
+                "description": "",
+                "tags": [
+                    "Posts"
+                ],
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
+                "operationId": "createPosts",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Post"
+                            },
+                            "examples": {
+                                "post": {
+                                    "value": {
+                                        "content": "Meu primeiro post!"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Post criado com sucesso!"
+                    },
+                    "400": {
+                        "description": "Erros do Zod (ausência de content ou de token)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "path": [
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro inesperado"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Retornar todos os posts existentes no banco de dados",
+                "description": "",
+                "tags": [
+                    "Posts"
+                ],
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
+                "operationId": "getPosts",
+                "responses": {
+                    "200": {
+                        "description": "Todos os posts foram retornados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Post"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erros do Zod (token não informado)"
+                    },
+                    "401": {
+                        "description": "Token inválido"
+                    },
+                    "500": {
+                        "description": "Erro inesperado"
+                    }
+                }
+            }
+        },
+        "/posts/{id}": {
+            "put": {
+                "summary": "Editar o 'content' de um post",
+                "description": "",
+                "tags": [
+                    "Posts"
+                ],
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
+                "operationId": "editPost",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id do post que será editado",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Post"
+                            },
+                            "examples": {
+                                "post": {
+                                    "value": {
+                                        "content": "Editando meu post!"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Post editado"
+                    },
+                    "400": {
+                        "description": "Erros do Zod ('content' vazio ou ausência de token)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "path": [
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token inválido"
+                    },
+                    "403": {
+                        "description": "Só é possível editar seu próprio post"
+                    },
+                    "404": {
+                        "description": "Não existe post com esse id"
+                    },
+                    "500": {
+                        "description": "Erro inesperado"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Deletar um post",
+                "description": "",
+                "tags": [
+                    "Posts"
+                ],
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
+                "operationId": "deletePost",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id do post que será deletado",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Post deletado"
+                    },
+                    "400": {
+                        "description": "Erros do Zod (ausência de token)"
+                    },
+                    "401": {
+                        "description": "Token inválido"
+                    },
+                    "403": {
+                        "description": "Apenas o autor do post ou um admin pode deletar um post."
+                    },
+                    "404": {
+                        "description": "Não existe post com esse id"
+                    },
+                    "500": {
+                        "description": "Erro inesperado"
+                    }
+                }
+            }
+        },
+        "/posts/{id}/rate": {
+            "put": {
+                "summary": "Avaliar um post",
+                "description": "Permite fazer uma avaliação positiva ou negativa de um post (upvote e downvote). <br> Para um postivo, o valor deve ser true e para um negativo, false. <br> Se fizer a operação em um post que já está avaliado passando o valor oposto, ele substituirá pelo novo valor,<br> e se passar um valor igual ao anterior, irá anular a avaliação.",
+                "tags": [
+                    "Posts"
+                ],
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
+                "operationId": "ratePost",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id do post que será avaliado",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "examples": {
+                                "comment": {
+                                    "value": {
+                                        "rating": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Post avaliado"
+                    },
+                    "400": {
+                        "description": "Erros do Zod (é obrigatório ter um valor em rating e um token)"
+                    },
+                    "401": {
+                        "description": "Token inválido"
+                    },
+                    "404": {
+                        "description": "Não existe post com esse id"
+                    },
+                    "500": {
+                        "description": "Erro inesperado"
+                    }
+                }
+            }
+        },
+        "/comments": {
+            "post": {
+                "summary": "Criar um novo comentário",
+                "description": "",
+                "tags": [
+                    "Comments"
+                ],
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
+                "operationId": "createComments",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Comment"
+                            },
+                            "examples": {
+                                "comment": {
+                                    "value": {
+                                        "content": "Meu primeiro comentário em um post!",
+                                        "postId": "123456"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Comentário criado com sucesso!"
+                    },
+                    "400": {
+                        "description": "Erros do Zod (ausência de content ou de token)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "path": [
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Não existe post com esse id"
+                    },
+                    "500": {
+                        "description": "Erro inesperado"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Retornar todos os comentários relacionados a um post",
+                "description": "",
+                "tags": [
+                    "Comments"
+                ],
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
+                "parameters": [{
+                    "name": "postId",
+                    "in": "query",
+                    "description": "Id do post para pegar seus comentários",
+                    "required": true
+                }],
+                "operationId": "getComments",
+                "responses": {
+                    "200": {
+                        "description": "Todos os comentários foram retornados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Comment"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erros do Zod (token não informado)"
+                    },
+                    "401": {
+                        "description": "Token inválido"
+                    },
+                    "500": {
+                        "description": "Erro inesperado"
+                    }
+                }
+            }
+        },
+        "/comments/{id}": {
+            "put": {
+                "summary": "Editar o 'content' de um comentário",
+                "description": "",
+                "tags": [
+                    "Comments"
+                ],
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
+                "operationId": "editComment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id do comentário que será editado",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Comment"
+                            },
+                            "examples": {
+                                "comment": {
+                                    "value": {
+                                        "content": "Editando meu comentário!"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Comentário editado."
+                    },
+                    "400": {
+                        "description": "Erros do Zod ('content' vazio ou ausência de token)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "path": [
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token inválido"
+                    },
+                    "403": {
+                        "description": "Só é possível editar seu próprio comentário"
+                    },
+                    "404": {
+                        "description": "Não existe comentário com esse id"
+                    },
+                    "500": {
+                        "description": "Erro inesperado"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Deletar um comentário",
+                "description": "",
+                "tags": [
+                    "Comments"
+                ],
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
+                "operationId": "deleteComment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id do comentário que será deletado",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Comentário deletado."
+                    },
+                    "400": {
+                        "description": "Erros do Zod (ausência de token)"
+                    },
+                    "401": {
+                        "description": "Token inválido"
+                    },
+                    "403": {
+                        "description": "Apenas o autor do comentário ou um admin pode deletar um comentário."
+                    },
+                    "404": {
+                        "description": "Não existe comentário com esse id"
+                    },
+                    "500": {
+                        "description": "Erro inesperado"
+                    }
+                }
+            }
+        },
+        "/comments/{id}/rate": {
+            "put": {
+                "summary": "Avaliar um comentário",
+                "description": "Permite fazer uma avaliação positiva ou negativa de um comentário (upvote e downvote). <br> Para um postivo, o valor deve ser true e para um negativo, false. <br> Se fizer a operação em um comentário que já está avaliado passando o valor oposto, ele substituirá pelo novo valor,<br> e se passar um valor igual ao anterior, irá anular a avaliação.",
+                "tags": [
+                    "Comments"
+                ],
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
+                "operationId": "rateComment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id do comentário que será avaliado",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "examples": {
+                                "comment": {
+                                    "value": {
+                                        "rating": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Comentário avaliado"
+                    },
+                    "400": {
+                        "description": "Erros do Zod (é obrigatório ter um valor em rating e um token)"
+                    },
+                    "401": {
+                        "description": "Token inválido"
+                    },
+                    "404": {
+                        "description": "Não existe comentário com esse id"
+                    },
+                    "500": {
+                        "description": "Erro inesperado"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "ADMIN",
+                            "NORMAL"
+                        ]
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Post": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "content": {
+                        "type": "string"
+                    },
+                    "upvotes": {
+                        "type": "number"
+                    },
+                    "downvotes": {
+                        "type": "number"
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    },
+                    "creatorId": {
+                        "type": "string"
+                    },
+                    "creatorName": {
+                        "type": "string"
+                    },
+                    "commentsCount": {
+                        "type": "number"
+                    }
+                }
+            },
+            "Comment": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "content": {
+                        "type": "string"
+                    },
+                    "upvotes": {
+                        "type": "number"
+                    },
+                    "downvotes": {
+                        "type": "number"
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    },
+                    "creatorId": {
+                        "type": "string"
+                    },
+                    "creatorName": {
+                        "type": "string"
+                    },
+                    "postId": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "Authorization": {
+                "type": "apiKey",
+                "name": "authorization",
+                "in": "header"
+            }
+        }
+    }
+}
