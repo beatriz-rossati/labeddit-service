@@ -40,9 +40,9 @@ export class CommentController {
         try {
             const input = GetCommentsSchema.parse({
                 token: req.headers.authorization,
-                postId: req.params.postId
+                postId: req.query.postId
             })
-
+           
             const output = await this.commentBusiness.getComments(input)
 
             res.status(200).send(output)

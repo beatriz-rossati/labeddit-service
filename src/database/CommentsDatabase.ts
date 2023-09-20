@@ -73,7 +73,6 @@ export class CommentDatabase extends BaseDatabase {
                 user_id: ratingDB.user_id,
                 comment_id: ratingDB.comment_id
             })
-        console.log()
         if (result === undefined) {
             return undefined
         } else if (result.rating === 1) {

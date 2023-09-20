@@ -1,9 +1,10 @@
 import { UserDatabase } from "../database/UserDatabase";
 import { LoginInputDTO, LoginOutputDTO } from "../dtos/user/login.dto";
 import { SignupInputDTO, SignupOutputDTO } from "../dtos/user/signup.dto";
+import { ConflictError } from "../errors/ConflictError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { UnauthorizedError } from "../errors/UnauthorizedError";
-import { TokenPayload, USER_ROLES, User } from "../models/User";
+import { ADMIN_CODE, TokenPayload, USER_ROLES, User } from "../models/User";
 import { HashManager } from "../services/HashManager";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
@@ -17,7 +18,22 @@ export class UserBusiness {
     ) { }
 
     signup = async (input: SignupInputDTO): Promise<SignupOutputDTO> => {
-        const { name, email, password } = input
+        const { name, email, password, adminCode } = input
+
+        let isAdmin = false
+        if (adminCode != undefined) {
+            if (adminCode === ADMIN_CODE) {
+                isAdmin = true
+            } else {
+                throw new UnauthorizedError("Código de admin inválido")
+            }
+        }
+
+        const userDB = await this.userDatabase.findUserByEmail(email)
+        if (userDB) {
+            throw new ConflictError("E-mail já cadastrado")
+        }
+
         const id = this.idGenerator.generate()
 
         const hashedPassword = await this.hashManager.hash(password)
@@ -27,7 +43,7 @@ export class UserBusiness {
             name,
             email,
             hashedPassword,
-            USER_ROLES.NORMAL,
+            isAdmin ? USER_ROLES.ADMIN : USER_ROLES.NORMAL,
             new Date().toISOString()
         )
 

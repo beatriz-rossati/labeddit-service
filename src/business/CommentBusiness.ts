@@ -194,8 +194,6 @@ export class CommentBusiness {
             throw new UnauthorizedError()
         }
 
-        console.log(payload)
-
         const commentDBWithCreator =
             await this.commentDatabase.findCommentById(commentId)
 
@@ -221,10 +219,8 @@ export class CommentBusiness {
             comment_id: commentId,
             rating: rating ? 1 : 0
         }
-        console.log(ratingDB)
 
         const ratingExists = await this.commentDatabase.findRating(ratingDB)
-        console.log(ratingExists)
 
         if (!ratingExists) {
             await this.commentDatabase.insertRating(ratingDB)
@@ -241,8 +237,6 @@ export class CommentBusiness {
                     comment.addDownvote()
                 }
             } else if (ratingExists === COMMENT_UPVOTES.ALREADY_DOWNVOTED) {
-                console.log(ratingExists)
-
                 if (rating === false) {
                     await this.commentDatabase.removeRating(ratingDB)
                     comment.removeDownvote()
@@ -253,10 +247,9 @@ export class CommentBusiness {
                 }
             }
         }
-        console.log("aaa")
 
         await this.commentDatabase.updateComment(comment.toCommentDB())
 
-        return undefined
+        return "Comentário avaliado."
     }
 }

@@ -58,7 +58,6 @@ export class PostBusiness {
         const postsJoinUserDB = await this.postDatabase.getPosts()
 
         const posts = postsJoinUserDB.map((postJoinUser) => {
-            console.log(postJoinUser)
             const post = new Post(
                 postJoinUser.id,
                 postJoinUser.content,
@@ -91,7 +90,7 @@ export class PostBusiness {
             throw new NotFoundError("Não existe post com esse id")
         }
         if (payload.id !== postDB.creator_id) {
-            throw new ForbiddenError("Você só pode editar seu próprio post.")
+            throw new ForbiddenError("Só é possível editar seu próprio post")
         }
 
         const post = new Post(
@@ -131,7 +130,7 @@ export class PostBusiness {
         }
         if (payload.role !== USER_ROLES.ADMIN) {
             if (payload.id !== postDB.creator_id) {
-                throw new ForbiddenError("Só o autor do post ou um admin pode um post.")
+                throw new ForbiddenError("Apenas o autor do post ou um admin pode deletar um post.")
             }
         }
 
@@ -150,13 +149,8 @@ export class PostBusiness {
             throw new UnauthorizedError()
         }
 
-        console.log(payload)
-
         const postDBWithCreator =
             await this.postDatabase.findPostByIdJoinUser(postId)
-
-        console.log(postDBWithCreator)
-
 
         if (!postDBWithCreator) {
             throw new NotFoundError("Não existe post com esse Id")
@@ -180,22 +174,13 @@ export class PostBusiness {
             rating: rating ? 1 : 0
         }
 
-        console.log(ratingDB)
-
         const ratingExists = await this.postDatabase.findRating(ratingDB)
-
-        console.log(ratingExists)
 
         if (!ratingExists){
             await this.postDatabase.insertRating(ratingDB)
-            console.log("ratingExists1")
             rating ? post.addUpvote() : post.addDownvote()
-            console.log("ratingExists2")
-
         } else {
             if (ratingExists === POST_UPVOTES.ALREADY_UPVOTED) {
-                console.log(ratingExists)
-
                 if (rating) {
                     await this.postDatabase.removeRating(ratingDB)
                     post.removeUpvote()
@@ -205,8 +190,6 @@ export class PostBusiness {
                     post.addDownvote()
                 }
             } else if (ratingExists === POST_UPVOTES.ALREADY_DOWNVOTED) {
-                console.log(ratingExists)
-
                 if (rating === false) {
                     await this.postDatabase.removeRating(ratingDB)
                     post.removeDownvote()
@@ -218,11 +201,9 @@ export class PostBusiness {
             }
         }
 
-        console.log("ratingExists")
-
         await this.postDatabase.updatePost(post.toPostDB())
 
-        return undefined
+        return "Post avaliado"
     }
 }
 

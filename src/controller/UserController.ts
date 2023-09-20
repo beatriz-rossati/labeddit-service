@@ -15,7 +15,8 @@ export class UserController {
             const input = SignupSchema.parse({
                 name: req.body.name,
                 email: req.body.email,
-                password: req.body.password
+                password: req.body.password,
+                adminCode: req.body.adminCode
             })
 
             const output = await this.userBusiness.signup(input)

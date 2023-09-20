@@ -3,6 +3,8 @@ export enum USER_ROLES {
     ADMIN = "ADMIN"
 }
 
+export const ADMIN_CODE = "123456"
+
 export interface TokenPayload {
     id: string,
     name: string,

@@ -11,6 +11,7 @@
     "noImplicitAny": true,                            
     "skipLibCheck": true,      
     "moduleResolution": "NodeNext",
-    "module": "NodeNext"          
+    "module": "NodeNext",
+    "resolveJsonModule": true          
   }
 }
