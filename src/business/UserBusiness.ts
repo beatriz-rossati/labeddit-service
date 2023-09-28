@@ -56,7 +56,8 @@ export class UserBusiness {
         }
 
         const output: SignupOutputDTO = {
-            token: this.tokenManager.createToken(payload)
+            token: this.tokenManager.createToken(payload),
+            userId: id
         }
         return output
     }
@@ -93,7 +94,8 @@ export class UserBusiness {
         }
 
         const output: LoginOutputDTO = {
-            token: this.tokenManager.createToken(payload)
+            token: this.tokenManager.createToken(payload),
+            userId: user.getId()
         }
 
         return output
