@@ -8,7 +8,8 @@ export interface SignupInputDTO {
 }
 
 export interface SignupOutputDTO {
-    token: string
+    token: string,
+    userId: string
 }
 
 export const SignupSchema = z.object({
